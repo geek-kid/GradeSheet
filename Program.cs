@@ -1,4 +1,5 @@
-﻿using GradeSheet;
+﻿// Coded by Arya Taheri
+using GradeSheet;
 
 Console.WriteLine("Students File?: ");
 try
