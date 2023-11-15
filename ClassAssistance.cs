@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace GradeSheet
 {
@@ -23,11 +24,14 @@ namespace GradeSheet
 
         public float GetAverage(List<Tuple<string, int>> toAverage)
         {
+            int mark = 0;
             int sum = 0;
-            foreach(var course in toAverage)
+            foreach(var course in toAverage) { 
                 sum += studentCourses[course.Item1]*course.Item2;
-            
-            return sum / toAverage.Count;
+                mark += course.Item2;
+            }
+
+            return sum / mark;
         }
 
         public Tuple<string, char> CalcGrade(List<Tuple<string, int>> toAverage) 
@@ -68,18 +72,29 @@ namespace GradeSheet
         public void GetPrimeNumber()
         {
             string toPrint = $"{name} {lastName} | ";
-            foreach (var course in studentCourses)
+            foreach (string key in studentCourses.Keys)
             {
-                if (course.Value >= 2)
-                    continue;
-
-                for (int i = 2; i <= Math.Sqrt(course.Value); i++)
-                    if (course.Value % i == 0) 
-                        continue;
-                toPrint += $"{course.Key}: {course.Value}, ";
-                
+                int point = studentCourses[key];
+                if (IsPrime(point))
+                toPrint += $"{key}: {point}, ";
             }
             Console.WriteLine(toPrint);
+
+        }
+        static bool IsPrime(int num)
+        {
+            if (num < 2)
+            {
+                return false;
+            }
+            for (int i = 2; i <= Math.Sqrt(num); i++)
+            {
+                if (num % i == 0)
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public Student(string name, string lastName, string[] scors)
@@ -176,10 +191,10 @@ namespace GradeSheet
 
         public List<Tuple<string, char>> GetGrade()
         {
-            List<Tuple<string, float>> toReturn = new();
+            List<Tuple<string, char>> toReturn = new();
             foreach (Student student in students)
             {
-                toReturn.Add(calc);
+                toReturn.Add(student.CalcGrade(courses.Values.SelectMany(list => list).ToList()));
             }
             return toReturn;
         }
@@ -220,7 +235,6 @@ namespace GradeSheet
 
                     if (i > 99)
                         break;
-                    GetAverage();
                 }
             }
             else
@@ -229,6 +243,13 @@ namespace GradeSheet
                 throw new Exception();
             }
         }
+
+        public void GetPrimeScores() 
+        {
+            foreach (Student student in students)
+                student.GetPrimeNumber();
+        }
+
 
     }
 }
