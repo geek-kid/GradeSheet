@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 namespace GradeSheet
 {
@@ -18,6 +19,65 @@ namespace GradeSheet
             { "English", 0 },
             { "Sport", 0  },
         };
+        char grade;
+
+        public float getAvarage(List<Tuple<string, int>> toAvarage)
+        {
+            int sum = 0;
+            foreach(var course in toAvarage)
+            {
+                sum += this.studentCourses[course.Item1]*course.Item2;
+            }
+            return sum/toAvarage.Count;
+        }
+
+        public char calcGrade(List<Tuple<string, int>> toAvarage) 
+        {
+            float avarage = getAvarage(toAvarage);
+
+            if (avarage <= 20&& 17 <= avarage)
+            {
+                this.grade = 'A';
+                return this.grade;
+            }
+
+            else if (avarage <= 17 && 15 <= avarage)
+            {
+                this.grade = 'B';
+                return this.grade;
+            }
+
+            else if (avarage <= 15 && 13 <= avarage)
+            {
+                this.grade = 'C';
+                return this.grade;
+            }
+
+            else if (avarage <= 10 && 13 <= avarage)
+            {
+                this.grade = 'D';
+                return this.grade;
+            }
+
+            else if (avarage <= 7 && 10 <= avarage)
+            {
+                this.grade = 'E';
+                return this.grade;
+            }
+
+            else if (avarage <= 3 && 7 <= avarage)
+            {
+                this.grade = 'F';
+                return this.grade;
+            }
+
+            else if (avarage <= 0 && 3 <= avarage)
+            {
+                this.grade = 'G';
+                return this.grade;
+            }
+            else { return 'N'; }
+        }
 
         public Student(string name, string lastName, string[] scors)
         {
@@ -48,9 +108,9 @@ namespace GradeSheet
             {
                 "importent", new ()
                 {
-                    new ("advancedProgramming1", 2),
-                    new ("addvancedProgramming2", 2),
-                    new ("OOP", 2)
+                    new ("advancedProgramming1", 3),
+                    new ("addvancedProgramming2", 3),
+                    new ("OOP", 3)
                 }
             },
             {
@@ -71,6 +131,11 @@ namespace GradeSheet
                 }
             }
         };
+        public float getArageImportants()
+        {
+            
+        }
+        
 
 
         public Semester(string path)

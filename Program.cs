@@ -11,7 +11,7 @@ void executer(){
         {
             Console.WriteLine("bad input try again");
         }
-    } while (path != null);
+    } while (path == null);
 
     try
     {
@@ -21,3 +21,4 @@ void executer(){
         executer();
     }
 }
+executer();
