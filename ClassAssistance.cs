@@ -1,13 +1,13 @@
-﻿using Microsoft.VisualBasic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
+﻿using System;
+using System.Collections.Generic;
+
 namespace GradeSheet
 {
     class Student
     {
         public string name;
         public string lastName;
-        Dictionary<string, int> studentCourses = new() {
+        readonly Dictionary<string, int> studentCourses = new() {
             { "advancedProgramming1", 0 },
             { "advancedProgramming2", 0 },
             { "OOP", 0 },
@@ -21,62 +21,65 @@ namespace GradeSheet
         };
         char grade;
 
-        public float getAvarage(List<Tuple<string, int>> toAvarage)
+        public float GetAverage(List<Tuple<string, int>> toAverage)
         {
             int sum = 0;
-            foreach(var course in toAvarage)
-            {
-                sum += this.studentCourses[course.Item1]*course.Item2;
-            }
-            return sum/toAvarage.Count;
+            foreach(var course in toAverage)
+                sum += studentCourses[course.Item1]*course.Item2;
+            
+            return sum / toAverage.Count;
         }
 
-        public char calcGrade(List<Tuple<string, int>> toAvarage) 
+        public Tuple<string, char> CalcGrade(List<Tuple<string, int>> toAverage) 
         {
-            float avarage = getAvarage(toAvarage);
-
-            if (avarage <= 20&& 17 <= avarage)
+            Tuple<string, char> toReturn;
+            switch (GetAverage(toAverage))
             {
-                this.grade = 'A';
-                return this.grade;
+                case <= 20 and >= 17:
+                    grade = 'A';
+                    break;
+                case < 17 and >= 15:
+                    grade = 'B';
+                    break;
+                case < 15 and >= 13:
+                    grade = 'C';
+                    break;
+                case < 13 and >= 10:
+                    grade = 'D';
+                    break;
+                case < 10 and >= 7:
+                    grade = 'E';
+                    break;
+                case < 7 and >= 3:
+                    grade = 'F';
+                    break;
+                case < 3 and >= 0:
+                    grade = 'G';
+                    break;
+                default:
+                    grade = 'N';
+                    break;
             }
 
-            else if (avarage <= 17 && 15 <= avarage)
-            {
-                this.grade = 'B';
-                return this.grade;
-            }
+            toReturn = new(name, grade);
+            return toReturn;
+        }
 
-            else if (avarage <= 15 && 13 <= avarage)
+        public void GetPrimeNumber()
+        {
+            string toPrint = $"{name} {lastName} | ";
+            foreach (var course in studentCourses)
             {
-                this.grade = 'C';
-                return this.grade;
-            }
+                if (course.Value >= 2)
+                    continue;
 
-            else if (avarage <= 10 && 13 <= avarage)
-            {
-                this.grade = 'D';
-                return this.grade;
+                for (int i = 2; i <= Math.Sqrt(course.Value); i++)
+                    if (course.Value % i == 0) 
+                        continue;
+                toPrint += $"{course.Key}: {course.Value}, ";
+                
             }
-
-            else if (avarage <= 7 && 10 <= avarage)
-            {
-                this.grade = 'E';
-                return this.grade;
-            }
-
-            else if (avarage <= 3 && 7 <= avarage)
-            {
-                this.grade = 'F';
-                return this.grade;
-            }
-
-            else if (avarage <= 0 && 3 <= avarage)
-            {
-                this.grade = 'G';
-                return this.grade;
-            }
-            else { return 'N'; }
+            Console.WriteLine(toPrint);
         }
 
         public Student(string name, string lastName, string[] scors)
@@ -101,15 +104,15 @@ namespace GradeSheet
     }
     class Semester
     {
-        public Student[] student;
+        public Student[] students;
 
         public static Dictionary<string, List<Tuple<string, int>>> courses = new()
         {
             {
-                "importent", new ()
+                "important", new ()
                 {
                     new ("advancedProgramming1", 3),
-                    new ("addvancedProgramming2", 3),
+                    new ("advancedProgramming2", 3),
                     new ("OOP", 3)
                 }
             },
@@ -131,41 +134,99 @@ namespace GradeSheet
                 }
             }
         };
-        public float getArageImportants()
+        public List<Tuple<string, float>> GetAverageImportants()
         {
-            
+            List<Tuple<string, float>> toReturn = new();
+            foreach(Student student in students)
+            {
+                toReturn.Add(new Tuple<string, float>(student.name + " " + student.lastName, student.GetAverage(courses["important"])));
+            }
+            return toReturn;
         }
-        
+
+        public List<Tuple<string, float>> GetAverageShits()
+        {
+            List<Tuple<string, float>> toReturn = new();
+            foreach (Student student in students)
+            {
+                toReturn.Add(new Tuple<string, float>(student.name + " " + student.lastName, student.GetAverage(courses["shits"])));
+            }
+            return toReturn;
+        }
+
+        public List<Tuple<string, float>> GetAverageGoodToKnow()
+        {
+            List<Tuple<string, float>> toReturn = new();
+            foreach (Student student in students)
+            {
+                toReturn.Add(new Tuple<string, float>(student.name + " " + student.lastName, student.GetAverage(courses["goodToKnow"])));
+            }
+            return toReturn;
+        }
+
+        public List<Tuple<string, float>> GetAverage()
+        {
+            List<Tuple<string, float>> toReturn = new();
+            foreach (Student student in students)
+            {
+                toReturn.Add(new Tuple<string, float>(student.name + " " + student.lastName, student.GetAverage(courses.Values.SelectMany(list => list).ToList()))) ;
+            }
+            return toReturn;
+        }
+
+        public List<Tuple<string, char>> GetGrade()
+        {
+            List<Tuple<string, float>> toReturn = new();
+            foreach (Student student in students)
+            {
+                toReturn.Add(calc);
+            }
+            return toReturn;
+        }
 
 
         public Semester(string path)
         {
             Console.WriteLine(path);
             if (File.Exists(path))
-
             {
-                student = new Student[100];
+                students = new Student[100];
                 int i = 0;
-                StreamReader raw = new StreamReader(path);
-                while ((!raw.EndOfStream) && i < 100)
+
+                StreamReader raw = new(path);
+                while ((!raw.EndOfStream))
                 {
                     string[] information;
-                    try 
+                    string? line = raw.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+
+                    if (!line.Contains(','))
+                        continue;
+
+                    try
                     {
-                        information = raw.ReadLine().Split(",");
-                    } 
-                    catch 
+                        information = line.Split(',');
+                    }
+                    catch
                     {
                         Console.WriteLine($"Bad line(line: {i++})");
                         continue;
                     }
-                    if (information.Length > 0)
-                    {
-                        student[i] = new Student(information[0], information[1], (information.Skip(1).Skip(1).ToArray()));
-                        i++;
-                    }
-                    
+
+                    if (information.Length > 3)
+                        students[i++] = new Student(information[0], information[1], information.Skip(2).ToArray());
+
+                    if (i > 99)
+                        break;
+                    GetAverage();
                 }
+            }
+            else
+            {
+                Console.WriteLine("File Not Found");
+                throw new Exception();
             }
         }
 
